@@ -62,7 +62,7 @@ namespace AbcCompany.Orders.Application.Services
                         Id = product.Id,
                         Discount = product.Discount,
                         ProductId = product.ProductId,
-                        Quantity = product.ProductQuantity,
+                        Quantity = product.Quantity,
                         ProductName = product.ProductName,
                         ProductUnitValue = product.ProductUnitValue
                     });

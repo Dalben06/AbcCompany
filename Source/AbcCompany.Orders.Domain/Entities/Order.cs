@@ -17,6 +17,8 @@ namespace AbcCompany.Orders.Domain.Entities
             OrderStatusName = orderStatusId.ToString();
             Total = total;
             DiscountTotal = discountTotal;
+            Payments = new List<OrderPayment>();
+            Products = new List<OrderProduct>();
         }
 
         public Order(int clientId, string customerName, int branchId, string branchName, int orderNumber)
@@ -28,8 +30,15 @@ namespace AbcCompany.Orders.Domain.Entities
             BranchName = branchName;
             OrderStatusId = OrderStatus.Completed;
             OrderStatusName = nameof(OrderStatus.Completed);
+            Payments = new List<OrderPayment>();
+            Products = new List<OrderProduct>();
         }
-
+        // Dapper
+        public Order()
+        {
+            Payments = new List<OrderPayment>();
+            Products = new List<OrderProduct>();
+        }
         public int OrderNumber { get; private set; }
         public int ClientId { get; private set; }
         public string ClientName { get; private set; }

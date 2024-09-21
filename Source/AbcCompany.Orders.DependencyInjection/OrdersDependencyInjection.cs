@@ -1,6 +1,8 @@
-﻿using AbcCompany.Orders.Application.Commands;
+﻿using AbcCompany.Core.Domain.Entities;
+using AbcCompany.Orders.Application.Commands;
 using AbcCompany.Orders.Application.Events;
 using AbcCompany.Orders.Application.Interfaces;
+using AbcCompany.Orders.Application.Models;
 using AbcCompany.Orders.Application.Services;
 using AbcCompany.Orders.Data.Repositories;
 using AbcCompany.Orders.Domain.IRepositories;
@@ -29,7 +31,7 @@ namespace AbcCompany.Orders.DependencyInjection
 
         private static void AddOrderCommands(this IServiceCollection services)
         {
-            services.AddScoped<IRequestHandler<RegisterNewOrderCommand, ValidationResult>, OrderCommandHandler>();
+            services.AddScoped<IRequestHandler<RegisterNewOrderCommand, ResponseHttp<OrderModel>>, OrderCommandHandler>();
         }
 
         private static void AddOrderEvents(this IServiceCollection services)

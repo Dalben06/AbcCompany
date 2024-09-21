@@ -24,8 +24,8 @@ namespace AbcCompany.Orders.Domain.Entities
         public void SetOrderId(int orderId)
         {
 
-            if (orderId < 0)
-                OrderId = OrderId;
+            if (orderId > 0)
+                OrderId = orderId;
         }
 
     }

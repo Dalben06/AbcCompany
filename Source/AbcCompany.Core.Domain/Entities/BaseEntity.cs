@@ -1,5 +1,5 @@
 ﻿using AbcCompany.Core.Domain.Messages;
-using System.ComponentModel.DataAnnotations;
+using Dapper.Contrib.Extensions;
 
 namespace AbcCompany.Core.Domain.Entities
 {
@@ -8,8 +8,9 @@ namespace AbcCompany.Core.Domain.Entities
         [Key]
         public int Id { get; set; }
 
-
+       
         private List<Event> _domainEvents;
+        [Computed]
         public IReadOnlyCollection<Event> DomainEvents => _domainEvents?.AsReadOnly();
 
         protected BaseEntity()

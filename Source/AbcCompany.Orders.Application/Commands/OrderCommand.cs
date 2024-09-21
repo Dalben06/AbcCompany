@@ -3,7 +3,7 @@ using AbcCompany.Orders.Application.Models;
 
 namespace AbcCompany.Orders.Application.Commands
 {
-    public abstract class OrderCommand : Command
+    public abstract class OrderCommand : Command<OrderModel> 
     {
         public int OrderNumber { get; protected set; }
         public int ClientId { get; protected set; }

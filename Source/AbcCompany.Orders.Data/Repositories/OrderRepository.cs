@@ -68,10 +68,10 @@ namespace AbcCompany.Orders.Data.Repositories
             return @"
                 SELECT Orders.*, pay.*,  pr.*  FROM Orders
                  JOIN OrderPayments as pay
-                 on pay.IdOrder = Orders.Id
+                 on pay.OrderId = Orders.Id
 
                  JOIN OrderProducts as pr
-                 on pr.IdOrder = Orders.Id
+                 on pr.OrderId = Orders.Id
                   WHERE 1 = 1 
             ";
         }

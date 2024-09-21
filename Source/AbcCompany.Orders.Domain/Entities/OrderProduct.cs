@@ -10,7 +10,7 @@ namespace AbcCompany.Orders.Domain.Entities
             ProductId = productId;
             ProductName = productName;
             ProductUnitValue = productUnitValue;
-            ProductQuantity = productQuantity;
+            Quantity = productQuantity;
             Discount = discount;
             Total = productUnitValue * productQuantity;
         }
@@ -22,14 +22,14 @@ namespace AbcCompany.Orders.Domain.Entities
         public int ProductId { get; private set; }
         public string ProductName { get; private set; }
         public decimal ProductUnitValue { get; private set; }
-        public decimal ProductQuantity { get; private set; }
+        public decimal Quantity { get; private set; }
         public decimal Discount { get; private set; }
         public decimal Total { get; private set; }
 
         public void SetOrderId(int orderId) {
 
-            if (orderId < 0)
-                OrderId = OrderId;
+            if (orderId > 0)
+                OrderId = orderId;
         }
     }
 }

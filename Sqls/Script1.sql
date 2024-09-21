@@ -1,4 +1,5 @@
 -- Criação do banco de dados
+
 CREATE DATABASE AbcCompany;
 GO
 
@@ -13,10 +14,10 @@ CREATE TABLE Orders (
     ClientName NVARCHAR(100),
     BranchId INT,
     BranchName NVARCHAR(100),
+    OrderStatusId INT,
+    OrderStatusName NVARCHAR(100),
     Total DECIMAL(18, 2),
     DiscountTotal DECIMAL(18, 2),
-    StatusOrderId INT,
-    StatusOrderName NVARCHAR(50)
 );
 GO
 
@@ -27,7 +28,7 @@ CREATE TABLE OrderProducts (
     ProductId INT NOT NULL,
     ProductName NVARCHAR(100),
     ProductUnitValue DECIMAL(18, 2),
-    ProductQuantity INT,
+    Quantity INT,
     Discount DECIMAL(18, 2),
     Total DECIMAL(18, 2)
 );

@@ -31,7 +31,8 @@ namespace AbcCompany.Orders.Application.Commands
 
         public override bool IsValid()
         {
-            return base.IsValid();
+            ValidationResult = new RegisterNewOrderCommandValidation().Validate(this);
+            return ValidationResult.IsValid;
         }
 
 
@@ -57,6 +58,15 @@ namespace AbcCompany.Orders.Application.Commands
 
                 RuleForEach(c => c.Products).SetValidator(new RegisterNewOrderCommandProdutsValidation());
                 RuleForEach(c => c.Payments).SetValidator(new RegisterNewOrderCommandPaymentsValidation());
+                RuleFor(c => c)
+                   .Must(HaveEqualPaymentsAndProductsTotal)
+                   .WithMessage("O total dos pagamentos deve ser igual ao total dos produtos.");
+
+            }
+            private bool HaveEqualPaymentsAndProductsTotal(RegisterNewOrderCommand command)
+            {
+                var totalPayments = command.Payments.Sum(p => p.Value);
+                return totalPayments == command.Total;
             }
         }
 
