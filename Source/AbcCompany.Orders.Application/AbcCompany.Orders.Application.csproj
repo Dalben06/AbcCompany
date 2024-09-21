@@ -7,15 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dapper.Contrib" Version="2.0.78" />
+    <PackageReference Include="FluentValidation" Version="11.10.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AbcCompany.Core.Domain\AbcCompany.Core.Domain.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Events\" />
+    <ProjectReference Include="..\AbcCompany.Orders.Domain\AbcCompany.Orders.Domain.csproj" />
   </ItemGroup>
 
 </Project>

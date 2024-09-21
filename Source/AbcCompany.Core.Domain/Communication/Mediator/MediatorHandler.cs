@@ -1,5 +1,6 @@
 ﻿using AbcCompany.Core.Domain.Messages;
 using AbcCompany.Core.Domain.Messages.CommonMessages;
+using FluentValidation.Results;
 using MediatR;
 
 namespace AbcCompany.Core.Domain.Communication.Mediator
@@ -18,7 +19,7 @@ namespace AbcCompany.Core.Domain.Communication.Mediator
             await _mediator.Publish(@event);
         }
 
-        public async Task<bool> SendCommand<T>(T command) where T : Command
+        public async Task<ValidationResult> SendCommand<T>(T command) where T : Command
         {
             return await _mediator.Send(command);
         }

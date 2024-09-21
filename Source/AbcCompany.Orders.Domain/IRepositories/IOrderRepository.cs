@@ -4,13 +4,13 @@ namespace AbcCompany.Orders.Domain.IRepositories
 {
     public interface IOrderRepository
     {
-        IEnumerable<Order> GetAll();
-        Order Get(int id);
-        Order GetByOrderNumber(int orderNumber);
-        int GetNextOrderNumber();
-        Order Add(Order order);
+        Task<IEnumerable<Order>> GetAll();
+        Task<Order> Get(int id);
+        Task<Order> GetByOrderNumber(int orderNumber);
+        Task<int> GetNextOrderNumber();
+        Task<Order> Add(Order order);
         //bool Update(Order order);
-        bool Cancel(Order order);
+        Task<bool> Cancel(Order order);
 
     }
 }

@@ -15,40 +15,40 @@ namespace AbcCompany.Orders.Data.Repositories
             _dbContext = dbContext;
         }
 
-        public Order Get(int id)
+        public async Task<Order> Get(int id)
         {
             var dic = new Dictionary<int, Order>();
-            _dbContext.DbConnection.Query<Order, OrderPayment, OrderProduct, Order>(DefaultSql() + " AND Orders.Id = @id", SQLMap(dic), new { id });
+            await _dbContext.DbConnection.QueryAsync<Order, OrderPayment, OrderProduct, Order>(DefaultSql() + " AND Orders.Id = @id", SQLMap(dic), new { id });
             return dic.FirstOrDefault().Value;
         }
 
-        public IEnumerable<Order> GetAll()
+        public async Task<IEnumerable<Order>> GetAll()
         {
             var dic = new Dictionary<int, Order>();
-            _dbContext.DbConnection.Query<Order, OrderPayment, OrderProduct, Order>(DefaultSql(), SQLMap(dic));
+            await _dbContext.DbConnection.QueryAsync<Order, OrderPayment, OrderProduct, Order>(DefaultSql(), SQLMap(dic));
             return dic.Values;
         }
 
-        public Order GetByOrderNumber(int orderNumber)
+        public async Task<Order> GetByOrderNumber(int orderNumber)
         {
             var dic = new Dictionary<int, Order>();
-            _dbContext.DbConnection.Query<Order, OrderPayment, OrderProduct, Order>(DefaultSql() + " AND Orders.OrderNumber = @orderNumber", SQLMap(dic), new { orderNumber });
+            await _dbContext.DbConnection.QueryAsync<Order, OrderPayment, OrderProduct, Order>(DefaultSql() + " AND Orders.OrderNumber = @orderNumber", SQLMap(dic), new { orderNumber });
             return dic.FirstOrDefault().Value;
         }
 
-        public int GetNextOrderNumber()
+        public async Task<int> GetNextOrderNumber()
         {
             var sql = "SELECT  ISNULL(MAX(OrderNumber), 0) + 1 AS NextOrderNumber FROM  [Orders]";
-            return _dbContext.DbConnection.QueryFirstOrDefault<int>(sql);
+            return await _dbContext.DbConnection.QueryFirstOrDefaultAsync<int>(sql);
         }
-        public Order Add(Order order)
+        public async Task<Order> Add(Order order)
         {
-            order.Id = (int)_dbContext.DbConnection.Insert(order);
+            order.Id = (int) await _dbContext.DbConnection.InsertAsync(order);
             order.SetOrderIdInProducts();
             order.SetOrderIdInPayments();
 
-            _dbContext.DbConnection.Insert(order.Payments);
-            _dbContext.DbConnection.Insert(order.Products);
+            await _dbContext.DbConnection.InsertAsync(order.Payments);
+            await _dbContext.DbConnection.InsertAsync(order.Products);
             return order;
         }
         public bool Update(Order order)
@@ -56,10 +56,10 @@ namespace AbcCompany.Orders.Data.Repositories
             return _dbContext.DbConnection.Update(order);
         }
 
-        public bool Cancel(Order order)
+        public async Task<bool> Cancel(Order order)
         {
             var sql = "UPDATE Orders SET IdStatusOrder = @OrderStatusId WHERE Id = @Id";
-            return _dbContext.DbConnection.Execute(sql, order) > 0;
+            return await _dbContext.DbConnection.ExecuteAsync(sql, order) > 0;
         }
 
 

@@ -1,30 +1,42 @@
 ﻿using AbcCompany.Core.Domain.Entities;
+using AbcCompany.Orders.Domain.Enums;
 using Dapper.Contrib.Extensions;
 
 namespace AbcCompany.Orders.Domain.Entities
 {
     public class Order : BaseEntity
     {
-        public Order(int orderNumber, int clientId, string customerName, int branchId, string branchName, int orderStatusId, int orderStatusName, decimal total, decimal discountTotal)
+        public Order(int orderNumber, int clientId, string customerName, int branchId, string branchName, OrderStatus orderStatusId, decimal total, decimal discountTotal)
         {
             OrderNumber = orderNumber;
             ClientId = clientId;
-            CustomerName = customerName;
+            ClientName = customerName;
             BranchId = branchId;
             BranchName = branchName;
             OrderStatusId = orderStatusId;
-            OrderStatusName = orderStatusName;
+            OrderStatusName = orderStatusId.ToString();
             Total = total;
             DiscountTotal = discountTotal;
         }
 
+        public Order(int clientId, string customerName, int branchId, string branchName, int orderNumber)
+        {
+            OrderNumber = orderNumber;
+            ClientId = clientId;
+            ClientName = customerName;
+            BranchId = branchId;
+            BranchName = branchName;
+            OrderStatusId = OrderStatus.Completed;
+            OrderStatusName = nameof(OrderStatus.Completed);
+        }
+
         public int OrderNumber { get; private set; }
         public int ClientId { get; private set; }
-        public string CustomerName { get; private set; }
+        public string ClientName { get; private set; }
         public int BranchId { get; private set; }
         public string BranchName { get; private set; }
-        public int OrderStatusId { get; private set; }
-        public int OrderStatusName { get; private set; }
+        public OrderStatus OrderStatusId { get; private set; }
+        public string OrderStatusName { get; private set; }
         public decimal Total { get; private set; }
         public decimal DiscountTotal { get; private set; }
 
@@ -39,9 +51,10 @@ namespace AbcCompany.Orders.Domain.Entities
             Payments.Add(payment);
         }
 
-        public void AddProduct(OrderPayment payment)
+        public void AddProduct(OrderProduct product)
         {
-            Payments.Add(payment);
+            Products.Add(product);
+            Total = Products.Sum(p => p.Total);
         }
 
         public void AddPayments(List<OrderPayment> payments)
@@ -52,6 +65,7 @@ namespace AbcCompany.Orders.Domain.Entities
         public void AddProducts(List<OrderProduct> products)
         {
             Products.AddRange(products);
+            Total = Products.Sum(p => p.Total);
         }
 
 

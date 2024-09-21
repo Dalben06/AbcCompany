@@ -4,7 +4,7 @@ namespace AbcCompany.Orders.Domain.Entities
 {
     public class OrderProduct : BaseEntity
     {
-        public OrderProduct(int orderId, int productId, string productName, decimal productUnitValue, decimal productQuantity, decimal discount, decimal total)
+        public OrderProduct(int orderId, int productId, string productName, decimal productUnitValue, decimal productQuantity, decimal discount)
         {
             OrderId = orderId;
             ProductId = productId;
@@ -12,7 +12,7 @@ namespace AbcCompany.Orders.Domain.Entities
             ProductUnitValue = productUnitValue;
             ProductQuantity = productQuantity;
             Discount = discount;
-            Total = total;
+            Total = productUnitValue * productQuantity;
         }
         public OrderProduct()
         {
