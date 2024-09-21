@@ -1,4 +1,5 @@
 ﻿using AbcCompany.Core.Domain.Entities;
+using AbcCompany.Orders.Domain.Enums;
 
 namespace AbcCompany.Orders.Domain.Entities
 {
@@ -13,6 +14,9 @@ namespace AbcCompany.Orders.Domain.Entities
             Quantity = productQuantity;
             Discount = discount;
             Total = productUnitValue * productQuantity;
+            OrderProductStatusId = OrderProductStatus.Active;
+            OrderProductStatusName = nameof(OrderProductStatus.Active);
+
         }
         public OrderProduct()
         {
@@ -25,6 +29,15 @@ namespace AbcCompany.Orders.Domain.Entities
         public decimal Quantity { get; private set; }
         public decimal Discount { get; private set; }
         public decimal Total { get; private set; }
+
+        public OrderProductStatus OrderProductStatusId { get; private set; }
+        public string OrderProductStatusName { get; private set; }
+
+        public void CancelProduct()
+        {
+            OrderProductStatusId = OrderProductStatus.Canceled;
+            OrderProductStatusName = nameof(OrderProductStatus.Canceled);
+        }
 
         public void SetOrderId(int orderId) {
 

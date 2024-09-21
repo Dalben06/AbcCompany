@@ -8,6 +8,7 @@ namespace AbcCompany.Core.Domain.Messages
 
         protected Event()
         {
+            MessageId = Guid.NewGuid();
             Timestamp = DateTime.Now;
         }
     }

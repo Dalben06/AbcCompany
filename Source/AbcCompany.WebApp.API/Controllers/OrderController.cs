@@ -41,5 +41,18 @@ namespace AbcCompany.WebApp.API.Controllers
 
         }
 
+
+        [HttpPut("UpdateOrder")]
+        public async Task<IActionResult> UpdateOrder(ChangeOrderModel model)
+        {
+            var res = await _mediatorHandler.SendCommand<UpdateOrderAndProductsCommand, OrderModel>(new UpdateOrderAndProductsCommand(
+                model.Id,model.ProductsToCancel,model.PaymentsToCancel,model.Products,model.Payments));
+
+            if (!res.Validation.IsValid) return CustomResponse(res.Validation);
+
+            return CustomResponse(res.Model);
+
+        }
+
     }
 }

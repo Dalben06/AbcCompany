@@ -36,35 +36,15 @@ namespace AbcCompany.Orders.Domain.Entities
         public DateTime Date { get; private set; }
 
         [Computed]  
-        public decimal TotalProdutos => Products.Sum(p => p.Total);
+        public decimal TotalProdutos => Products.Where(p => p.OrderProductStatusId == OrderProductStatus.Active).Sum(p => p.Total);
         public decimal Total => TotalProdutos - DiscountTotal;
-        public decimal DiscountTotal => Products.Sum(p => p.Discount);
+        public decimal DiscountTotal => Products.Where(p => p.OrderProductStatusId == OrderProductStatus.Active).Sum(p => p.Discount);
 
         [Computed]
         public List<OrderPayment> Payments { get; private set; }
 
         [Computed]
         public List<OrderProduct> Products { get; private set; }
-
-        //public void AddPayment(OrderPayment payment) 
-        //{
-        //    Payments.Add(payment);
-        //}
-
-        //public void AddProduct(OrderProduct product)
-        //{
-        //    Products.Add(product);
-        //}
-
-        //public void AddPayments(List<OrderPayment> payments)
-        //{
-        //    Payments.AddRange(payments);
-        //}
-
-        //public void AddProducts(List<OrderProduct> products)
-        //{
-        //    Products.AddRange(products);
-        //}
 
 
         public void SetOrderIdInPayments()
@@ -82,6 +62,14 @@ namespace AbcCompany.Orders.Domain.Entities
 
             foreach (var product in Products)
                 product.SetOrderId(Id);
+        }
+
+        public bool ValidatePaymentsAndProductHaveValueToCompleteOrder()
+        {
+            if (TotalProdutos != Payments.Where(p => p.OrderPaymentStatusId == OrderPaymentStatus.Approved).Sum(p => p.Value))
+                return false;
+
+            return true;
         }
 
     }

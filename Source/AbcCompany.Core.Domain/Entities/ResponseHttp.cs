@@ -11,5 +11,15 @@ namespace AbcCompany.Core.Domain.Entities
             Validation = new ValidationResult();
         }
 
+
+        public void AddError(string message)
+        {
+            Validation.Errors.Add(new ValidationFailure(string.Empty, message));
+        }
+
+        public void AddErrors(ValidationResult validation)
+        {
+            Validation.Errors.AddRange(validation?.Errors ?? new List<ValidationFailure>());
+        }
     }
 }

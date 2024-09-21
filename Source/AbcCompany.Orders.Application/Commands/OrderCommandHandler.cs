@@ -13,7 +13,9 @@ using System.Transactions;
 namespace AbcCompany.Orders.Application.Commands
 {
     public class OrderCommandHandler : CommandHandler,
-        IRequestHandler<RegisterNewOrderCommand, ResponseHttp<OrderModel>>
+        IRequestHandler<RegisterNewOrderCommand, ResponseHttp<OrderModel>>,
+        IRequestHandler<UpdateOrderAndProductsCommand, ResponseHttp<OrderModel>>
+
     {
         private readonly IOrderRepository _orderRepository;
         private readonly IOrderService _orderService;
@@ -30,7 +32,7 @@ namespace AbcCompany.Orders.Application.Commands
             var res =  new ResponseHttp<OrderModel>();
             if (!message.IsValid())
             {
-                res.Validation.Errors.AddRange(message.ValidationResult.Errors);
+                res.AddErrors(message.ValidationResult);
                 return res;
             }
 
@@ -52,6 +54,83 @@ namespace AbcCompany.Orders.Application.Commands
                 using (var scope = new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled))
                 {
                     await _orderRepository.Add(order);
+                    scope.Complete();
+                }
+                await Commit();
+                res.Model = await _orderService.GetById(order.Id);
+            }
+            catch (Exception e)
+            {
+                res.Validation.Errors.Add(new ValidationFailure(string.Empty, e.Message));
+            }
+
+            return res;
+        }
+
+        public async Task<ResponseHttp<OrderModel>> Handle(UpdateOrderAndProductsCommand message, CancellationToken cancellationToken)
+        {
+            var res = new ResponseHttp<OrderModel>();
+            if (!message.IsValid())
+            {
+                res.AddErrors(message.ValidationResult);
+                return res;
+            }
+
+            try
+            {
+                var order = await _orderRepository.Get(message.Id);
+                if (order == null) throw new Exception("Venda nao encontrada!");
+
+                if (message.PaymentsToCancel.Any())
+                {
+                    foreach (var payToCancel in message.PaymentsToCancel)
+                    {
+                        var payment = order.Payments.FirstOrDefault(c => c.Id == payToCancel.Id);
+                        if (payment == null) {
+                            res.AddError($"Nao foi possivel encontrar o pagamento para cancelar : {payToCancel.PaymentName} - {payToCancel.Id}");
+                            continue;
+                        }
+
+                        payment.CancelPayment();
+                        order.AddDomainEvent(new OrderPaymentCanceledEvent(payToCancel.Id, payToCancel.PaymentId));
+                    }
+                }
+
+                if (message.ProductsToCancel.Any())
+                {
+                    foreach (var prodToCancel in message.ProductsToCancel)
+                    {
+                        var product = order.Products.FirstOrDefault(c => c.Id == prodToCancel.Id);
+                        if (product == null)
+                        {
+                            res.AddError($"Nao foi possivel encontrar o produto para cancelar : {prodToCancel.ProductName} - {prodToCancel.Id}");
+                            continue;
+                        }
+
+                        product.CancelProduct();
+                        order.AddDomainEvent(new OrderProductCanceledEvent(prodToCancel.Id, prodToCancel.ProductId));
+                    }
+                }
+
+                var products = new List<OrderProduct>();
+                foreach (var product in message.Products)
+                    order.Products.Add(new OrderProduct(order.Id, product.ProductId, product.ProductName, product.ProductUnitValue, product.Quantity, product.Discount));
+
+                var payments = new List<OrderPayment>();
+                foreach (var payment in message.Payments)
+                    order.Payments.Add(new OrderPayment(order.Id, payment.PaymentId, payment.PaymentName, payment.Value));
+
+                if (!order.ValidatePaymentsAndProductHaveValueToCompleteOrder())
+                    res.AddError("Os de pagamento e produtos não batem, favor revisar!");
+
+                if (!res.Validation.IsValid) return res;
+
+                order.AddDomainEvent(new OrderUpdatedEvent(order.Id,order.OrderNumber));
+                AddDomainChanges(order);
+
+                using (var scope = new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    await _orderRepository.Update(order);
                     scope.Complete();
                 }
                 await Commit();

@@ -32,11 +32,15 @@ namespace AbcCompany.Orders.DependencyInjection
         private static void AddOrderCommands(this IServiceCollection services)
         {
             services.AddScoped<IRequestHandler<RegisterNewOrderCommand, ResponseHttp<OrderModel>>, OrderCommandHandler>();
+            services.AddScoped<IRequestHandler<UpdateOrderAndProductsCommand, ResponseHttp<OrderModel>>, OrderCommandHandler>();
         }
 
         private static void AddOrderEvents(this IServiceCollection services)
         {
             services.AddScoped<INotificationHandler<OrderCompletedEvent>, OrderEventHandler>();
+            services.AddScoped<INotificationHandler<OrderPaymentCanceledEvent>, OrderEventHandler>();
+            services.AddScoped<INotificationHandler<OrderProductCanceledEvent>, OrderEventHandler>();
+            services.AddScoped<INotificationHandler<OrderUpdatedEvent>, OrderEventHandler>();
         }
 
         private static void AddOrderRepositories(this IServiceCollection services)
