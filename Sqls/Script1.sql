@@ -10,6 +10,7 @@ GO
 CREATE TABLE Orders (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     OrderNumber INT NOT NULL,
+    Date DATETIME,
     ClientId INT NOT NULL,
     ClientName NVARCHAR(100),
     BranchId INT,
@@ -22,6 +23,7 @@ CREATE TABLE Orders (
 GO
 
 -- Tabela OrderProducts
+
 CREATE TABLE OrderProducts (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     OrderId INT FOREIGN KEY REFERENCES [Orders](Id),

@@ -36,7 +36,6 @@ namespace AbcCompany.Orders.Application.Commands
 
             try
             {
-                var order = new Order(message.ClientId, message.ClientName, message.BranchId, message.BranchName, await _orderRepository.GetNextOrderNumber());
                 var products = new List<OrderProduct>();
                 foreach (var product in message.Products)
                     products.Add(new OrderProduct(0, product.ProductId, product.ProductName, product.ProductUnitValue, product.Quantity, product.Discount));
@@ -45,8 +44,9 @@ namespace AbcCompany.Orders.Application.Commands
                 foreach (var payment in message.Payments)
                     payments.Add(new OrderPayment(0, payment.PaymentId, payment.PaymentName, payment.Value));
 
-                order.AddPayments(payments);
-                order.AddProducts(products);
+                var order = new Order(message.ClientId, message.ClientName, message.BranchId, message.BranchName
+                    , await _orderRepository.GetNextOrderNumber(), payments, products );
+               
                 order.AddDomainEvent(new OrderCompletedEvent(order.OrderNumber));
                 AddDomainChanges(order);
                 using (var scope = new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled))

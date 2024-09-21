@@ -1,16 +1,8 @@
-﻿using AbcCompany.Orders.Domain.Entities;
-using AbcCompany.Orders.Domain.Enums;
-using Dapper.Contrib.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AbcCompany.Orders.Application.Models
+﻿namespace AbcCompany.Orders.Application.Models
 {
     public class OrderModel
     {
+        public DateTime Date { get; set; }
         public int Id { get; set; }
         public int OrderNumber { get; set; }
         public int ClientId { get; set; }

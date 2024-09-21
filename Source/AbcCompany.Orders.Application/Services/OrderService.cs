@@ -46,10 +46,14 @@ namespace AbcCompany.Orders.Application.Services
                     Id = order.Id,
                     Total = order.Total,
                     OrderStatusName = order.OrderStatusName,
+                    OrderStatusId = (int)order.OrderStatusId,
                     BranchName = order.BranchName,
+                    BranchId = order.BranchId,
                     ClientName = order.ClientName,
+                    ClientId = order.ClientId,
                     DiscountTotal = order.DiscountTotal,
                     OrderNumber = order.OrderNumber,
+                    Date = order.Date,
                 };
                 var payments = new List<OrderPaymentModel>();
                 foreach (var payment in order.Payments)
