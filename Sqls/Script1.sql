@@ -30,6 +30,8 @@ CREATE TABLE OrderProducts (
     ProductId INT NOT NULL,
     ProductName NVARCHAR(100),
     ProductUnitValue DECIMAL(18, 2),
+    OrderProductStatusId INT NOT NULL,
+    OrderProductStatusName NVARCHAR(100),
     Quantity INT,
     Discount DECIMAL(18, 2),
     Total DECIMAL(18, 2)
@@ -42,6 +44,8 @@ CREATE TABLE OrderPayments (
     OrderId INT FOREIGN KEY REFERENCES [Orders](Id),
     PaymentId INT NOT NULL,
     PaymentName NVARCHAR(50),
+    OrderPaymentStatusId INT NOT NULL,
+    OrderPaymentStatusName NVARCHAR(100),
     Value DECIMAL(18, 2)
 );
 GO
