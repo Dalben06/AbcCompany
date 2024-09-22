@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AbcCompany.Core.DependencyInjection\AbcCompany.Core.DependencyInjection.csproj" />
+    <ProjectReference Include="..\AbcCompany.Orders.DependencyInjection\AbcCompany.Orders.DependencyInjection.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,5 @@
 ﻿using AbcCompany.Core.DependencyInjection;
+using AbcCompany.Orders.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,6 +11,9 @@ namespace AbcCompany.DependencyInjection
         {
 
             services.AddDependencyInjectionCoreModule(configuration);
+            services.AddDependencyInjectionOrderModule();
+
+
 
         }
 
