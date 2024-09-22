@@ -6,7 +6,6 @@ using AbcCompany.Orders.Application.Models;
 using AbcCompany.Orders.Application.Services;
 using AbcCompany.Orders.Data.Repositories;
 using AbcCompany.Orders.Domain.IRepositories;
-using FluentValidation.Results;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -33,6 +32,7 @@ namespace AbcCompany.Orders.DependencyInjection
         {
             services.AddScoped<IRequestHandler<RegisterNewOrderCommand, ResponseHttp<OrderModel>>, OrderCommandHandler>();
             services.AddScoped<IRequestHandler<UpdateOrderAndProductsCommand, ResponseHttp<OrderModel>>, OrderCommandHandler>();
+            services.AddScoped<IRequestHandler<CancelOrderCommand, ResponseHttp<OrderModel>>, OrderCommandHandler>();
         }
 
         private static void AddOrderEvents(this IServiceCollection services)
@@ -41,6 +41,7 @@ namespace AbcCompany.Orders.DependencyInjection
             services.AddScoped<INotificationHandler<OrderPaymentCanceledEvent>, OrderEventHandler>();
             services.AddScoped<INotificationHandler<OrderProductCanceledEvent>, OrderEventHandler>();
             services.AddScoped<INotificationHandler<OrderUpdatedEvent>, OrderEventHandler>();
+            services.AddScoped<INotificationHandler<OrderCanceledEvent>, OrderEventHandler>();
         }
 
         private static void AddOrderRepositories(this IServiceCollection services)

@@ -71,6 +71,16 @@ namespace AbcCompany.Orders.Domain.Entities
 
             return true;
         }
+        public void Cancel()
+        {
+            OrderStatusId = OrderStatus.Canceled;
+            OrderStatusName = nameof(OrderStatus.Canceled);
+            foreach (var product in Products)
+                product.CancelProduct();
+
+            foreach (var pay in Payments)
+                pay.CancelPayment();
+        }
 
     }
 }

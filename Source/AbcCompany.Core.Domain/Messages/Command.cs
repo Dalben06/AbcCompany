@@ -16,7 +16,7 @@ namespace AbcCompany.Core.Domain.Messages
 
         public virtual bool IsValid()
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException("Must need to implement IsValid Method in your Command");
         }
     }
 }

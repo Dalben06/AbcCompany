@@ -14,9 +14,9 @@ namespace AbcCompany.Orders.Application.Services
             _orderRepository = orderRepository;
         }
 
-        public async Task<IEnumerable<OrderModel>> GetAll()
+        public async Task<IEnumerable<OrderModel>> GetAll(bool showCanceledItens = false)
         {
-            var orders = await _orderRepository.GetAll();
+            var orders = await _orderRepository.GetAll(showCanceledItens);
 
             if (!orders.Any()) return Enumerable.Empty<OrderModel>();
             List<OrderModel> ordersModel = MapOrder(orders);
@@ -25,9 +25,9 @@ namespace AbcCompany.Orders.Application.Services
         }
 
       
-        public async Task<OrderModel> GetById(int id)
+        public async Task<OrderModel> GetById(int id, bool showCanceledItens = false)
         {
-            var order = await _orderRepository.Get(id);
+            var order = await _orderRepository.Get(id, showCanceledItens);
 
             if (order == null) return null;
 
@@ -57,7 +57,13 @@ namespace AbcCompany.Orders.Application.Services
                 };
                 var payments = new List<OrderPaymentModel>();
                 foreach (var payment in order.Payments)
-                    payments.Add(new OrderPaymentModel { Id = payment.Id, PaymentId = payment.PaymentId, PaymentName = payment.PaymentName, Value = payment.Value });
+                    payments.Add(new OrderPaymentModel { 
+                        Id = payment.Id, 
+                        PaymentId = payment.PaymentId, 
+                        PaymentName = payment.PaymentName, 
+                        Value = payment.Value,
+                        Status = payment.OrderPaymentStatusName
+                    });
 
                 var products = new List<OrderProductModel>();
                 foreach (var product in order.Products)
@@ -68,6 +74,7 @@ namespace AbcCompany.Orders.Application.Services
                         ProductId = product.ProductId,
                         Quantity = product.Quantity,
                         ProductName = product.ProductName,
+                        Status = product.OrderProductStatusName,
                         ProductUnitValue = product.ProductUnitValue
                     });
 

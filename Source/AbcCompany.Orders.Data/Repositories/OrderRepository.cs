@@ -65,8 +65,10 @@ namespace AbcCompany.Orders.Data.Repositories
 
         public async Task<bool> Cancel(Order order)
         {
-            var sql = "UPDATE Orders SET IdStatusOrder = @OrderStatusId WHERE Id = @Id";
-            return await _dbContext.DbConnection.ExecuteAsync(sql, order) > 0;
+            await _dbContext.DbConnection.UpdateAsync(order);
+            await _dbContext.DbConnection.UpdateAsync(order.Products);
+            await _dbContext.DbConnection.UpdateAsync(order.Payments);
+            return true;
         }
 
 

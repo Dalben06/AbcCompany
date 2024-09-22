@@ -18,9 +18,9 @@ namespace AbcCompany.WebApp.API.Controllers
         }
 
         [HttpGet("GetAll")]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] bool showCanceled = false)
         {
-            return CustomResponse(await _orderService.GetAll());
+            return CustomResponse(await _orderService.GetAll(showCanceled));
         }
 
         [HttpGet("GetById/{id}")]
@@ -36,6 +36,17 @@ namespace AbcCompany.WebApp.API.Controllers
                 model.ClientId,model.ClientName, model.BranchId, model.BranchName, model.Payments, model.Products));
 
             if(!res.Validation.IsValid) return CustomResponse(res.Validation);
+
+            return CustomResponse(res.Model);
+
+        }
+
+        [HttpPost("CancelOrder/{id}")]
+        public async Task<IActionResult> RegisterOrder(int id)
+        {
+            var res = await _mediatorHandler.SendCommand<CancelOrderCommand, OrderModel>(new CancelOrderCommand(id));
+
+            if (!res.Validation.IsValid) return CustomResponse(res.Validation);
 
             return CustomResponse(res.Model);
 

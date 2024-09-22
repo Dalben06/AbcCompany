@@ -14,7 +14,9 @@ namespace AbcCompany.Orders.Application.Commands
 {
     public class OrderCommandHandler : CommandHandler,
         IRequestHandler<RegisterNewOrderCommand, ResponseHttp<OrderModel>>,
-        IRequestHandler<UpdateOrderAndProductsCommand, ResponseHttp<OrderModel>>
+        IRequestHandler<UpdateOrderAndProductsCommand, ResponseHttp<OrderModel>>,
+        IRequestHandler<CancelOrderCommand, ResponseHttp<OrderModel>>
+
 
     {
         private readonly IOrderRepository _orderRepository;
@@ -135,6 +137,41 @@ namespace AbcCompany.Orders.Application.Commands
                 }
                 await Commit();
                 res.Model = await _orderService.GetById(order.Id);
+            }
+            catch (Exception e)
+            {
+                res.Validation.Errors.Add(new ValidationFailure(string.Empty, e.Message));
+            }
+
+            return res;
+        }
+
+        public async Task<ResponseHttp<OrderModel>> Handle(CancelOrderCommand message, CancellationToken cancellationToken)
+        {
+            var res = new ResponseHttp<OrderModel>();
+            if (!message.IsValid())
+            {
+                res.AddErrors(message.ValidationResult) ;
+                return res;
+            }
+
+            try
+            {
+                var order = await _orderRepository.Get(message.Id);
+                if (order == null) throw new Exception("Venda nao encontrada!");
+
+                order.Cancel();
+                order.AddDomainEvent(new OrderCanceledEvent(order.Id, order.OrderNumber));
+                order.Products.ForEach(p => { order.AddDomainEvent(new OrderProductCanceledEvent(p.Id, p.ProductId)); });
+                order.Payments.ForEach(p => { order.AddDomainEvent(new OrderPaymentCanceledEvent(p.Id, p.PaymentId)); });
+                AddDomainChanges(order);
+                using (var scope = new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    await _orderRepository.Cancel(order);
+                    scope.Complete();
+                }
+                await Commit();
+                res.Model = await _orderService.GetById(order.Id, true);
             }
             catch (Exception e)
             {

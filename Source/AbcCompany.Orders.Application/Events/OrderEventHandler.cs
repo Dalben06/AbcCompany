@@ -6,7 +6,8 @@ namespace AbcCompany.Orders.Application.Events
         INotificationHandler<OrderCompletedEvent>,
         INotificationHandler<OrderPaymentCanceledEvent>,
         INotificationHandler<OrderProductCanceledEvent>,
-        INotificationHandler<OrderUpdatedEvent>
+        INotificationHandler<OrderUpdatedEvent>,
+        INotificationHandler<OrderCanceledEvent>
     {
         public Task Handle(OrderCompletedEvent notification, CancellationToken cancellationToken)
         {
@@ -39,6 +40,14 @@ namespace AbcCompany.Orders.Application.Events
             // Add message queue to send message
 
             // Send notification email the order has been updated!
+            return Task.CompletedTask;
+        }
+
+        public Task Handle(OrderCanceledEvent notification, CancellationToken cancellationToken)
+        {
+            // Add message queue to send message
+
+            // Send notification email the order has been canceled!
             return Task.CompletedTask;
         }
     }

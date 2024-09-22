@@ -5,8 +5,8 @@ namespace AbcCompany.Orders.Application.Interfaces
 {
     public interface IOrderService
     {
-        Task<IEnumerable<OrderModel>> GetAll();
-        Task<OrderModel> GetById(int id);
+        Task<IEnumerable<OrderModel>> GetAll(bool showCanceledItens = false);
+        Task<OrderModel> GetById(int id, bool showCanceledItens = false);
 
 
     }
