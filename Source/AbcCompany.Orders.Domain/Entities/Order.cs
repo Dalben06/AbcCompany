@@ -66,7 +66,7 @@ namespace AbcCompany.Orders.Domain.Entities
 
         public bool ValidatePaymentsAndProductHaveValueToCompleteOrder()
         {
-            if (TotalProdutos != Payments.Where(p => p.OrderPaymentStatusId == OrderPaymentStatus.Approved).Sum(p => p.Value))
+            if (Total != Payments.Where(p => p.OrderPaymentStatusId == OrderPaymentStatus.Approved).Sum(p => p.Value))
                 return false;
 
             return true;
