@@ -1,4 +1,5 @@
 using AbcCompany.WebApp.API.Config;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,14 @@ builder.Services.AddCors(policyBuilder =>
                 .AllowAnyHeader()
                 .AllowCredentials())
 );
+// Configurar Serilog
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .CreateLogger();
+
+// Substitui o logger padrão pelo Serilog
+builder.Host.UseSerilog();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -29,8 +38,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseSerilogRequestLogging();
 app.UseAuthorization();
-
 app.MapControllers();
 app.UseCors();
 app.Run();
