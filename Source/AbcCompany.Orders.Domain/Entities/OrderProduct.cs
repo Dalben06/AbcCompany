@@ -1,5 +1,6 @@
 ﻿using AbcCompany.Core.Domain.Entities;
 using AbcCompany.Orders.Domain.Enums;
+using Dapper.Contrib.Extensions;
 
 namespace AbcCompany.Orders.Domain.Entities
 {
@@ -32,7 +33,8 @@ namespace AbcCompany.Orders.Domain.Entities
 
         public OrderProductStatus OrderProductStatusId { get; private set; }
         public string OrderProductStatusName { get; private set; }
-
+        [Computed]
+        public bool IsCanceled => OrderProductStatusId == OrderProductStatus.Canceled;
         public void CancelProduct()
         {
             OrderProductStatusId = OrderProductStatus.Canceled;
