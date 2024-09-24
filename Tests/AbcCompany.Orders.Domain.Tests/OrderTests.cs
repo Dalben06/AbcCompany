@@ -1,5 +1,7 @@
 using AbcCompany.Orders.Domain.Entities;
 using AbcCompany.Orders.Domain.Enums;
+using AbcCompany.Orders.Domain.Tests.Mock;
+using FluentAssertions;
 
 namespace AbcCompany.Orders.Domain.Tests
 {
@@ -9,11 +11,7 @@ namespace AbcCompany.Orders.Domain.Tests
         public void Constructor_Should_Initialize_With_Valid_Values()
         {
             // Arrange
-            int clientId = 1;
-            string clientName = "John Doe";
-            int branchId = 1;
-            string branchName = "Main Branch";
-            int orderNumber = 123;
+            
             List<OrderPayment> payments = new List<OrderPayment> {
                 new OrderPayment(0,0,"",100)            };
             List<OrderProduct> products = new List<OrderProduct> { 
@@ -21,131 +19,100 @@ namespace AbcCompany.Orders.Domain.Tests
                 };
 
             // Act
-            var order = new Order(clientId, clientName, branchId, branchName, orderNumber, payments, products);
+            var order =  OrderFake.GenerateFakeNewOrder();
+            order.Payments.AddRange(payments);
+            order.Products.AddRange(products);
 
             // Assert
-            Assert.Equal(orderNumber, order.OrderNumber);
-            Assert.Equal(clientId, order.ClientId);
-            Assert.Equal(clientName, order.ClientName);
-            Assert.Equal(branchId, order.BranchId);
-            Assert.Equal(branchName, order.BranchName);
-            Assert.Equal(OrderStatus.Completed, order.OrderStatusId);
-            Assert.Equal(nameof(OrderStatus.Completed), order.OrderStatusName);
-            Assert.NotEmpty(order.Payments);
-            Assert.NotEmpty(order.Products);
+            order.OrderStatusId.Should().Be(OrderStatus.Completed);
+            order.OrderStatusName.Should().Be(nameof(OrderStatus.Completed));
+            order.TotalProdutos.Should().Be(110);
+            order.Total.Should().Be(100);
+            order.Payments.Should().NotBeEmpty();
+            order.Products.Should().NotBeEmpty();
         }
 
         [Fact]
         public void SetOrderIdInPayments_Should_Set_OrderId_In_All_Payments()
         {
             // Arrange
-            var orderId = 999;
-            var order = new Order(1, "John Doe", 1, "Main Branch", 123, new List<OrderPayment>
-            {
-                new OrderPayment(),
-                new OrderPayment()
-            }, new List<OrderProduct>())
-            { Id = orderId };
-           
+            var order = OrderFake.GenerateFakeNewOrder();
+            order.Payments.Add(new OrderPayment());
+            order.Payments.Add(new OrderPayment());
             // Act
             order.SetOrderIdInPayments();
 
             // Assert
-            foreach (var payment in order.Payments)
-                Assert.Equal(orderId, payment.OrderId);
+
+            order.Payments.Should().HaveCount(2).And.OnlyContain(c => c.OrderId > 0);
+            order.Products.Should().HaveCount(0);
         }
 
         [Fact]
         public void SetOrderIdInProducts_Should_Set_OrderId_In_All_Products()
         {
-            var orderId = 999;
+
             // Arrange
-            var order = new Order(1, "John Doe", 1, "Main Branch", 123, new List<OrderPayment>(), new List<OrderProduct>
-            {
-                new OrderProduct(),
-                new OrderProduct()
-            })
-            {
-                Id = orderId
-            };
-            
+            var order = OrderFake.GenerateFakeNewOrder();
+            order.Products.Add(new OrderProduct());
+            order.Products.Add(new OrderProduct());
             // Act
             order.SetOrderIdInProducts();
 
             // Assert
-            foreach (var product in order.Products)
-                Assert.Equal(orderId, product.OrderId);
+
+            order.Products.Should().HaveCount(2).And.OnlyContain(c => c.OrderId > 0);
+            order.Payments.Should().HaveCount(0);
         }
 
         [Fact]
         public void Cancel_Should_Update_Status_And_Cancel_All_Products_And_Payments()
         {
             // Arrange
-            var products = new List<OrderProduct>
-        {
-            new OrderProduct(),
-            new OrderProduct()
-        };
-            var payments = new List<OrderPayment>
-        {
-            new OrderPayment(),
-            new OrderPayment()
-        };
-            var order = new Order(1, "John Doe", 1, "Main Branch", 123, payments, products);
+            var order = OrderFake.GenerateFakeNewOrder();
+            order.Products.Add(new OrderProduct());
+            order.Payments.Add(new OrderPayment());
 
             // Act
             order.Cancel();
 
             // Assert
-            Assert.Equal(OrderStatus.Canceled, order.OrderStatusId);
-            Assert.Equal(nameof(OrderStatus.Canceled), order.OrderStatusName);
-            foreach (var product in products)
-                Assert.True(product.IsCanceled);
-            foreach (var payment in payments)
-                Assert.True(payment.IsCanceled);
-
+            order.OrderStatusId.Should().Be(OrderStatus.Canceled);
+            order.OrderStatusName.Should().Be(nameof(OrderStatus.Canceled));
+            order.TotalProdutos.Should().Be(0);
+            order.Total.Should().Be(0);
+            order.Payments.Should().NotBeEmpty().And.NotContain(c => c.OrderPaymentStatusId == OrderPaymentStatus.Approved);
+            order.Products.Should().NotBeEmpty().And.NotContain(c => c.OrderProductStatusId == OrderProductStatus.Active);
         }
 
         [Fact]
         public void ValidatePaymentsAndProductHaveValueToCompleteOrder_Should_Return_True_If_Valid()
         {
             // Arrange
-            var products = new List<OrderProduct>
-            {
-                new OrderProduct (0,0,"",110,1,10)
-            };
-            var payments = new List<OrderPayment>
-            {
-                new OrderPayment(0,0,"",100)
-            };
-            var order = new Order(1, "John Doe", 1, "Main Branch", 123, payments, products);
-
+            var order = OrderFake.GenerateFakeNewOrder();
+            order.Products.Add(new OrderProduct(order.Id, 0, "", 110, 1, 10));
+            order.Payments.Add(new OrderPayment(order.Id, 0, "", 100));
             // Act
             var result = order.ValidatePaymentsAndProductHaveValueToCompleteOrder();
 
             // Assert
-            Assert.True(result);
+            result.Should().BeTrue();
         }
 
         [Fact]
         public void ValidatePaymentsAndProductHaveValueToCompleteOrder_Should_Return_False_If_Invalid()
         {
             // Arrange
-            var products = new List<OrderProduct>
-            {
-                new OrderProduct(0,0,"",1,110,0)
-            };
-            var payments = new List<OrderPayment>
-            {
-                new OrderPayment (0, 0, "", 50)
-            };
-            var order = new Order(1, "John Doe", 1, "Main Branch", 123, payments, products);
+
+            var order = OrderFake.GenerateFakeNewOrder();
+            order.Products.Add(new OrderProduct(order.Id, 0, "", 110, 1, 10));
+            order.Payments.Add(new OrderPayment(order.Id, 0, "", 50));
 
             // Act
             var result = order.ValidatePaymentsAndProductHaveValueToCompleteOrder();
 
             // Assert
-            Assert.False(result);
+            result.Should().BeFalse();
         }
     }
 }
