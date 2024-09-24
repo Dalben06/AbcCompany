@@ -1,7 +1,9 @@
-﻿using AbcCompany.Core.Domain.Configuration;
+﻿using AbcCompany.Core.Domain.Communication.Mediator;
+using AbcCompany.Core.Domain.Configuration;
 using AbcCompany.Core.Domain.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 
 namespace AbcCompany.Core.DependencyInjection
 {
@@ -21,6 +23,10 @@ namespace AbcCompany.Core.DependencyInjection
 
             services.AddScoped<DbContext>();
             services.AddScoped<DbFactory>();
+
+            Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(x => x.FullName.ToLower().Contains("abccompany")).ToArray();
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(assemblies));
+            services.AddScoped<IMediatorHandler, MediatorHandler>();
         }
 
     }

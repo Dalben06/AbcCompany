@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using AbcCompany.Core.Domain.Messages;
+using Dapper.Contrib.Extensions;
 
 namespace AbcCompany.Core.Domain.Entities
 {
@@ -7,6 +8,10 @@ namespace AbcCompany.Core.Domain.Entities
         [Key]
         public int Id { get; set; }
 
+       
+        private List<Event> _domainEvents;
+        [Computed]
+        public IReadOnlyCollection<Event> DomainEvents => _domainEvents?.AsReadOnly();
 
         protected BaseEntity()
         {
@@ -54,6 +59,18 @@ namespace AbcCompany.Core.Domain.Entities
             T newEntity = (T)this.MemberwiseClone();
             newEntity.Id = 0;
             return newEntity;
+        }
+
+
+        public void AddDomainEvent(Event domainEvent)
+        {
+            _domainEvents = _domainEvents ?? new List<Event>();
+            _domainEvents.Add(domainEvent);
+        }
+
+        public void RemoveDomainEvent(Event domainEvent)
+        {
+            _domainEvents?.Remove(domainEvent);
         }
 
     }
